@@ -8,27 +8,6 @@
 #include <sys/wait.h>
 //#include <string.h>
 
-#define QUANT = 2;  //Quantum value in milliseconds
-
-/*
-* A basic Process Control Block struct to contain relevant details of all processes
-*/
-typedef struct pc_block {
-  pid_t pid;         //Process ID
-  unsigned int priority;    //Process priority, where 0 is the highest and 20 the lowest
-  char *exec_path;         //Path to executable, ex. ./starter.c (?)
-  char *p_argv[];           //Arguments to executable
-} pc_block;
-
-/*
-* Linked list node to contain a pc_block struct element and a pointer to the
-* next node
-*/
-typedef struct pc_node {
-  pc_block *element;
-  struct pc_node *next;
-} pc_node;
-
 
 int main(int argc, char *argv[]) {
     pid_t pid1 = 0, pid2 = 0;
@@ -48,4 +27,11 @@ int main(int argc, char *argv[]) {
     kill(pid1, SIGCONT); //Lets process execute
     usleep(500000); //Takes in microseconds,1 ms is 100 us
     kill(pid1, SIGTERM);  //Kills process
+
+    /*
+    int status;
+    pid_t result = waitpid( process_id, &status, WNOHANG );
+    if( result == 0) { // process is running }
+    else { // process has terminated and we can read its status using waitpid() // }
+    */
 }
