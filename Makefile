@@ -1,11 +1,11 @@
 all:
-	gcc -o printchars printchars.c
-	gcc -o starter starter.c
-	gcc -o shed my_sched.c
+	gcc -o printchars printchars.c -Wall -Wextra
+	gcc -o starter starter.c -Wall -Wextra
+	gcc -o shed my_sched.c -Wall -Wextra
 
 sched:
-	gcc -o printchars printchars.c
-	gcc -o shed my_sched.c
+	gcc -o printchars printchars.c -Wall -Wextra
+	gcc -o shed my_sched.c pc_block.c -Wall -Wextra
 
 
 clean:

@@ -7,9 +7,23 @@
 #include <signal.h>
 #include <sys/wait.h>
 //#include <string.h>
+#include "sched.h"
 
 
 int main(int argc, char *argv[]) {
+    //Read line
+    char* line;
+    Pc_node* head = NULL;
+    Proc* proc = NULL;
+    size_t len = 0;
+
+    //While there is a new line
+    while (getline(&line, &len, stdin) != -1) {
+      
+
+    }
+
+    //Run processes
     pid_t pid1 = 0, pid2 = 0;
 
     pid1 = fork();

@@ -30,15 +30,17 @@ typedef struct pc_node {
 /*
 * Allocates memory to a proc struct and fills it with relevant data
 */
-static Proc* makeProc(pid_t pid, unsigned int priority, char *exec_path, char *p_argv[]) {
+static Proc* makeProc(pid_t pid, unsigned int priority, char *exec_path, char **p_argv) {
     Proc* new_p = malloc(sizeof(Proc));
     new_p->pid = pid;
     new_p->priority = priority;
     new_p->exec_path = exec_path;
-    new_p->p_argv = p_argv;
+    // new_p->p_argv = p_argv;  //May need memcpy
 
     return new_p;
 }
+
+
 
 /*
 * Creates a new pc_node struct and adds it to the indicated position in the linked list
@@ -53,6 +55,13 @@ static Pc_node* makeProcNode(Proc* proc, Pc_node* previous) {
   	     previous->next = node;
     }
   	return node;
+
+}
+
+/*
+* Processes line form input to a Proc struct
+*/
+Proc* lineToProc(char* line, Pc_node* head) {
 
 }
 

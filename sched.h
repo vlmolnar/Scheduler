@@ -19,7 +19,7 @@ typedef struct proc {
 * next node
 */
 typedef struct pc_node {
-  proc *element;
+  Proc *element;
   struct pc_node *next;
 } Pc_node;
 
