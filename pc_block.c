@@ -62,7 +62,28 @@ static Pc_node* makeProcNode(Proc* proc, Pc_node* previous) {
 * Processes line form input to a Proc struct
 */
 Proc* lineToProc(char* line, Pc_node* head) {
+    pid_t pid; unsigned int priority; char *exec_path; char** p_argv;
+    Proc* proc = NULL;
+    unsigned int counter = 0;
+    char* token = strtok(line, " \n");
 
+
+    while(token != NULL) {
+        if (counter == 0) priority = strdup(token);
+      	else if (counter == 1) exec_path = strdup(token);
+      	else if (counter >= 2) p_argv = strdup(token); //Each one added to a new array?
+
+        token = strtok(NULL, " \n");
+        counter += 1;
+    }
+
+    if (priority >= 0 && priority <= 20 && exec_path) { //Quick validity check
+        proc = makeProc(-1, priority, exec_path, p_argv);
+        return proc;
+    } else {
+      free(priority); free(exec_path); free(p_argv);
+    }
+    return proc;
 }
 
 /*
