@@ -9,19 +9,31 @@
 //#include <string.h>
 #include "sched.h"
 
+#define BUFF_SIZE 255
 
 int main(int argc, char *argv[]) {
+    //Checks for a minimum of 1 argument
+    if (argc < 1) {
+      fprintf(stderr, "Program usage: ./sched <config_file_path>\n");
+      exit(0);
+    }
+
+    //Ref: https://www.tutorialspoint.com/cprogramming/c_file_io.htm
+    FILE *fp;
+    fp = fopen(argv[0], "r");  //Opens file for reading
+
     //Read line
-    char* line;
-    Pc_node* head = NULL;
+    char *line;
+    Pc_node* head_node = NULL;
     Proc* proc = NULL;
-    size_t len = 0;
+    // size_t len = 0;
 
     //While there is a new line
-    while (getline(&line, &len, stdin) != -1) {
-      
-
+    while ((getline(&line, (size_t) BUFF_SIZE, fp)) != -1) { //Ref: https://stackoverflow.com/questions/3501338/c-read-file-line-by-line
+        lineToProc(line, head_node);
     }
+
+    fclose(fp); //Closes file
 
     //Run processes
     pid_t pid1 = 0, pid2 = 0;

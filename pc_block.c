@@ -19,8 +19,7 @@ typedef struct args_node {
 
 
 typedef struct proc {
-  // pid_t pid;             //Process ID
-  unsigned int pid;         //Process ID
+  pid_t pid;                //Process ID
   unsigned int priority;    //Process priority, where 0 is the highest and 20 the lowest
   char *exec_path;          //Path to executable, ex. ./starter.c (?)
   Args_node* args;          //Arguments to executable
@@ -95,7 +94,7 @@ static Pc_node* makeProcNode(Proc* proc, Pc_node* previous) {
 * Inserts proc struct to the end of the list. If the list is empty (head == NULL),
 * proc is inserted to head
 */
-void addProcToEnd(Proc* proc, Pc_node* head) {
+static void addProcToEnd(Proc* proc, Pc_node* head) {
     if (proc == NULL) {
         fprintf(stderr, "%s\n", "Error: No process provided!");
         return;
@@ -162,7 +161,7 @@ void lineToProc(char* line, Pc_node* head_node) {
         counter += 1;
     }
 
-    if (priority >= 0 && priority <= 20 && exec_path) { //Quick validity check
+    if (priority <= 20 && exec_path != NULL) { //Quick validity check
         proc = makeProc(0, priority, exec_path, args_head);  //Process id 0 by default, given correct value when process is created
         addProcToEnd(proc, head_node);
     } else { //Invalid input
