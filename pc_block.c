@@ -94,17 +94,19 @@ static Pc_node* makeProcNode(Proc* proc, Pc_node* previous) {
 * Inserts proc struct to the end of the list. If the list is empty (head == NULL),
 * proc is inserted to head
 */
-static void addProcToEnd(Proc* proc, Pc_node* head) {
+static void addProcToEnd(Proc* proc, Pc_node** head) {
+  fprintf(stderr, "1 Head: %d\n", *head == NULL);
     if (proc == NULL) {
         fprintf(stderr, "%s\n", "Error: No process provided!");
         return;
     }
-    if (head == NULL) {
-        head = makeProcNode(proc, NULL); //Adds node to head of list
+    if (*head == NULL) {
+        *head = makeProcNode(proc, NULL); //Adds node to head of list
+        fprintf(stderr, "2 Head: %d\n", *head == NULL);
         return;
     }
 
-    Pc_node* current = head;
+    Pc_node* current = *head;
   while(1) {
     if (current->next == NULL) {  //Adds node to end of list
       makeProcNode(proc, current);
@@ -129,7 +131,7 @@ void cleanList(Pc_node* node) {
 /*
 * Processes line form input to a Proc struct
 */
-void lineToProc(char* line, Pc_node* head_node) {
+void lineToProc(char* line, Pc_node** head_node) {
     unsigned int priority; char *exec_path;
     Proc* proc = NULL;
     Args_node* args_head = NULL;
@@ -154,6 +156,9 @@ void lineToProc(char* line, Pc_node* head_node) {
             if (args_head == NULL) {
                 args_head = args_tail;
             }
+        } else {
+            fprintf(stderr, "Something went REALLY wrong with tokenising\n");
+            break;
         }
 
 
@@ -163,9 +168,41 @@ void lineToProc(char* line, Pc_node* head_node) {
 
     if (priority <= 20 && exec_path != NULL) { //Quick validity check
         proc = makeProc(0, priority, exec_path, args_head);  //Process id 0 by default, given correct value when process is created
-        addProcToEnd(proc, head_node);
+        fprintf(stderr, "pid: %d, priority: %d, exec_path: %s\n", proc->pid, proc->priority, proc->exec_path);
+        // if (*head_node == NULL) {
+        //     head_node = addProcToFront(proc);
+        // } else {
+            addProcToEnd(proc, head_node);
+        // }
+        fprintf(stderr, "Head_node: %d\n", head_node == NULL);
     } else { //Invalid input
       fprintf(stderr, "Tokenising error, quitting program.\n");
       // free(priority); free(exec_path); free(p_argv);
     }
+}
+
+
+/*
+* Prints all elements of a pc_node list, used for debugging
+*/
+void printList(Pc_node* head_node) {
+    fprintf(stderr, "Printing list...\n");
+    Pc_node* node = head_node;
+    Proc* proc;
+    Args_node* args;
+    while (node != NULL) {
+        proc = node->element;
+        args = proc->args;
+        fprintf(stderr, "pid: %d, priority: %d, exec_path: %s", proc->pid, proc->priority, proc->exec_path);
+        while (args != NULL) {
+            printf(", arg: %s", args->element);
+            args = args->next;
+        }
+        fprintf(stderr, "\n");
+        node = node->next;
+    }
+
+
+
+
 }

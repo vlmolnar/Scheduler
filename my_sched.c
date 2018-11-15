@@ -9,50 +9,55 @@
 //#include <string.h>
 #include "sched.h"
 
-#define BUFF_SIZE 255
 
 int main(int argc, char *argv[]) {
-    //Checks for a minimum of 1 argument
-    if (argc < 1) {
+    //Checfor a minimum of 1 argument
+    if (argc <= 1) {
       fprintf(stderr, "Program usage: ./sched <config_file_path>\n");
       exit(0);
     }
 
     //Ref: https://www.tutorialspoint.com/cprogramming/c_file_io.htm
     FILE *fp;
-    fp = fopen(argv[0], "r");  //Opens file for reading
+    fp = fopen(argv[1], "r");  //Opens file for reading
+    fprintf(stderr, "File opened\n");
 
     //Read line
-    char *line;
+    char line[225];
     Pc_node* head_node = NULL;
-    Proc* proc = NULL;
-    // size_t len = 0;
+    // size_t len = 225;
 
     //While there is a new line
-    while ((getline(&line, (size_t) BUFF_SIZE, fp)) != -1) { //Ref: https://stackoverflow.com/questions/3501338/c-read-file-line-by-line
-        lineToProc(line, head_node);
+    while ((fgets(line, sizeof(line), fp))) { //Ref: https://stackoverflow.com/questions/9206091/going-through-a-text-file-line-by-line-in-c
+      fprintf(stderr, "In while, line is: %s\n", line);
+        lineToProc(line, &head_node);
     }
-
     fclose(fp); //Closes file
 
+
+    printList(head_node);
+    cleanList(head_node);
+    fprintf(stderr, "Program finished executing!\n");
+
     //Run processes
-    pid_t pid1 = 0, pid2 = 0;
-
-    pid1 = fork();
-
-    if(pid1 < 0) {
-        fprintf(stderr, "Something went wrong while creating process!\n");
-    } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
-        printf("Parent process.\n");
-        kill(pid1,SIGSTOP);
-    } else {  // We are a child process -- overwrite our process space with the new program
-        printf("Child process.\n");
-        execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
-    }
-
-    kill(pid1, SIGCONT); //Lets process execute
-    usleep(500000); //Takes in microseconds,1 ms is 100 us
-    kill(pid1, SIGTERM);  //Kills process
+    // Proc* proc = NULL;
+    // pid_t pid1 = 0, pid2 = 0;
+    //
+    // pid1 = fork();
+    //
+    // if(pid1 < 0) {
+    //     fprintf(stderr, "Something went wrong while creating process!\n");
+    // } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
+    //     printf("Parent process.\n");
+    //     kill(pid1,SIGSTOP);
+    // } else {  // We are a child process -- overwrite our process space with the new program
+    //     printf("Child process.\n");
+    //     execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
+    // }
+    //
+    // kill(pid1, SIGCONT); //Lets process execute
+    // usleep(500000); //Takes in microseconds,1 ms is 100 us
+    // kill(pid1, SIGTERM);  //Kills process
 
     /*
     int status;

@@ -35,9 +35,10 @@ typedef struct pc_node {
 
 void changeProcPid(Proc* proc, pid_t new_pid);
 
-void lineToProc(char* line, Pc_node* head_node);
+void lineToProc(char* line, Pc_node** head_node);
 
 void cleanList(Pc_node* node);
 
+void printList(Pc_node* head_node);
 
 #endif

@@ -5,7 +5,7 @@ all:
 
 sched:
 	gcc -o printchars printchars.c -Wall -Wextra
-	gcc -o shed my_sched.c pc_block.c -Wall -Wextra
+	gcc -o sched my_sched.c pc_block.c sched.h -Wall -Wextra
 
 
 clean:
