@@ -10,6 +10,8 @@
 #include "sched.h"
 
 
+
+
 int main(int argc, char *argv[]) {
     //Checfor a minimum of 1 argument
     if (argc <= 1) {
@@ -36,28 +38,50 @@ int main(int argc, char *argv[]) {
 
 
     printList(head_node);
-    cleanList(head_node);
-    fprintf(stderr, "Program finished executing!\n");
+
+
 
     //Run processes
-    // Proc* proc = NULL;
-    // pid_t pid1 = 0, pid2 = 0;
-    //
-    // pid1 = fork();
-    //
-    // if(pid1 < 0) {
-    //     fprintf(stderr, "Something went wrong while creating process!\n");
-    // } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
-    //     printf("Parent process.\n");
-    //     kill(pid1,SIGSTOP);
-    // } else {  // We are a child process -- overwrite our process space with the new program
-    //     printf("Child process.\n");
-    //     execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
-    // }
-    //
-    // kill(pid1, SIGCONT); //Lets process execute
-    // usleep(500000); //Takes in microseconds,1 ms is 100 us
-    // kill(pid1, SIGTERM);  //Kills process
+    Pc_node* current_node = head_node;
+    Proc* proc = NULL;
+    pid_t pid1;
+    while (current_node) {
+        pid1 = fork();  //New process
+
+        if(pid1 < 0) {
+            fprintf(stderr, "Something went wrong while creating process!\n");
+        } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
+            printf("Parent process.\n");
+            // kill(pid1,SIGSTOP);
+        } else {  // We are a child process -- overwrite our process space with the new program
+            printf("Child process.\n");
+            // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
+            execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, NULL);  //TODO convert list into 2D array?
+
+        }
+
+        // kill(pid1, SIGCONT); //Lets process execute
+        // usleep(500000); //Takes in microseconds,1 ms is 100 us
+
+        pid_t result = 0;
+        while (!result) {
+            int status = 0;
+            // fprintf(stderr, "Inside status while...\n");
+            result = waitpid( pid1, &status, WNOHANG );
+            if (result == 0) {
+              // fprintf(stderr, "Exit condition NOT met\n");
+            }
+            if( result != 0) {
+              // fprintf(stderr, "Exit condition met\n");
+                kill(pid1, SIGTERM);  //Kills process
+                break;
+            }
+        }
+        // fprintf(stderr, "Outside status while...\n");
+        current_node = current_node->next;
+    }
+    cleanList(head_node);
+    fprintf(stderr, "Program finished executing!\n");
 
     /*
     int status;
