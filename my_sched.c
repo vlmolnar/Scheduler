@@ -45,6 +45,8 @@ int main(int argc, char *argv[]) {
     Pc_node* current_node = head_node;
     Proc* proc = NULL;
     pid_t pid1;
+    unsigned int prog_count = 0;
+    unsigned int kill_count = 0;
     while (current_node) {
         pid1 = fork();  //New process
 
@@ -52,7 +54,9 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Something went wrong while creating process!\n");
         } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
             printf("Parent process.\n");
-            // kill(pid1,SIGSTOP);
+            prog_count+= 1;
+            kill(pid1,SIGSTOP);
+            current_node->element->pid = pid1;  //Sets child's pid
         } else {  // We are a child process -- overwrite our process space with the new program
             printf("Child process.\n");
             // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
@@ -63,23 +67,57 @@ int main(int argc, char *argv[]) {
         // kill(pid1, SIGCONT); //Lets process execute
         // usleep(500000); //Takes in microseconds,1 ms is 100 us
 
-        pid_t result = 0;
-        while (!result) {
-            int status = 0;
-            // fprintf(stderr, "Inside status while...\n");
-            result = waitpid( pid1, &status, WNOHANG );
-            if (result == 0) {
-              // fprintf(stderr, "Exit condition NOT met\n");
-            }
-            if( result != 0) {
-              // fprintf(stderr, "Exit condition met\n");
-                kill(pid1, SIGTERM);  //Kills process
-                break;
-            }
-        }
-        // fprintf(stderr, "Outside status while...\n");
+
+        //FIFO
+        // pid_t result = 0;
+        // while (!result) {
+        //     int status = 0;
+        //     // fprintf(stderr, "Inside status while...\n");
+        //     result = waitpid( pid1, &status, WNOHANG );
+        //     if (result == 0) {
+        //       // fprintf(stderr, "Exit condition NOT met\n");
+        //     }
+        //     if( result != 0) {  //Child process finished executing
+        //       // fprintf(stderr, "Exit condition met\n");
+        //         kill(pid1, SIGTERM);  //Kills process
+        //         break;
+        //     }
+        // }
+        //END OF FIFO
+
         current_node = current_node->next;
     }
+
+    while (prog_count > kill_count) {
+          if (current_node == NULL) current_node = head_node; //Makes list loop
+          pid1 = current_node->element->pid;
+          fprintf(stderr, "pid1: %d\n", pid1);
+
+          if (pid1 != -1) { //Skips terminated processes
+
+          kill(pid1, SIGCONT); //Lets process execute
+          usleep(QUANT_VAL); //Takes in microseconds
+          id_t result = 0;
+          int status = 0;
+          result = waitpid( pid1, &status, WNOHANG );
+          if (result == 0) {
+              fprintf(stderr, "Child lives on\n");
+              kill(pid1,SIGSTOP); //Pauses process
+          }
+          if( result != 0) {  //Child process finished executing
+              fprintf(stderr, "Child is dead\n");
+              kill(pid1, SIGTERM);  //Terminates process
+              current_node->element->pid = -1; //Sets pid to indicate termination
+              kill_count += 1;
+          }
+      }
+      current_node = current_node->next;
+    }
+
+
+
+
+
     cleanList(head_node);
     fprintf(stderr, "Program finished executing!\n");
 

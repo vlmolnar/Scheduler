@@ -3,7 +3,7 @@
 
 #include <signal.h>
 
-#define QUANT = 2;  //Quantum value in milliseconds
+#define QUANT_VAL 2000  //Quantum value in microseconds, this is 2 milliseconds
 
 /*
 * A linked list to store the process variables as strings
