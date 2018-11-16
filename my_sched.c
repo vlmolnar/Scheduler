@@ -6,7 +6,7 @@
 //#include <limits.h>
 #include <signal.h>
 #include <sys/wait.h>
-//#include <string.h>
+#include <string.h>
 #include "sched.h"
 
 
@@ -43,7 +43,6 @@ int main(int argc, char *argv[]) {
 
     //Run processes
     Pc_node* current_node = head_node;
-    Proc* proc = NULL;
     pid_t pid1;
     unsigned int prog_count = 0;
     unsigned int kill_count = 0;
@@ -58,11 +57,44 @@ int main(int argc, char *argv[]) {
             prog_count+= 1;
             current_node->element->pid = pid1;  //Sets child's pid
         } else {  // We are a child process -- overwrite our process space with the new program
-            // printf("Child process.\n");
+            printf("Child process.\n");
             // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
-            char* ptArray[5];
-            execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, NULL);  //TODO convert list into 2D array?
+/*
+            Args_node* args_head = current_node->element->args;
+            if (args_head == NULL) {
+              printf("No args\n");
+              execl(current_node->element->exec_path, current_node->element->exec_path);  //TODO convert list into 2D array?
 
+            } else {
+              printf("Some args, length:%d\n", current_node->element->args_num);
+
+              char argsArray[current_node->element->args_num + 1][500]; // Initialises char pointer array made up of args_num number of 500 char length strings
+              Args_node* args_current = args_head;
+              unsigned int args_counter = 1;
+              strncpy(argsArray[0], current_node->element->exec_path, sizeof(current_node->element->exec_path) - 1);
+
+              while (args_current) {
+                // strncpy corruption fix: https://eklitzke.org/beware-of-strncpy-and-strncat
+
+                 strncpy(argsArray[args_counter], args_current->element, sizeof(args_current->element) - 1);
+
+                 fprintf(stderr,"args_curent: %s, argsarray: %s\n",args_current->element, argsArray[args_counter]);
+                 args_current = args_current->next;
+                 args_counter += 1;
+              }
+    */
+              // int i = 0;
+              // while (*argsArray[i]) {
+              //    fprintf(stderr,"array:  %s\n", argsArray[i]);
+              //    i += 1;
+              //  }
+               // fprintf(stderr,"0: %s, 1: %s, 2: %s\n", argsArray[0], argsArray[1], argsArray[2]);
+              execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, NULL);  //TODO convert list into 2D array?
+
+
+              // execvp(current_node->element->exec_path, argsArray);
+
+            /*}*/
         }
 
         // kill(pid1, SIGCONT); //Lets process execute

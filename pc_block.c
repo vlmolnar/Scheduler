@@ -97,7 +97,7 @@ static Pc_node* makeProcNode(Proc* proc, Pc_node* previous) {
 * proc is inserted to head
 */
 static void addProcToEnd(Proc* proc, Pc_node** head) {
-  fprintf(stderr, "1 Head: %d\n", *head == NULL);
+  // fprintf(stderr, "1 Head: %d\n", *head == NULL);
     if (proc == NULL) {
         fprintf(stderr, "%s\n", "Error: No process provided!");
         return;
@@ -178,7 +178,7 @@ void lineToProc(char* line, Pc_node** head_node) {
         // } else {
             addProcToEnd(proc, head_node);
         // }
-        fprintf(stderr, "Head_node: %d\n", head_node == NULL);
+        // fprintf(stderr, "Head_node: %d\n", head_node == NULL);
     } else { //Invalid input
       fprintf(stderr, "Tokenising error, quitting program.\n");
       // free(priority); free(exec_path); free(p_argv);
@@ -199,7 +199,7 @@ void printList(Pc_node* head_node) {
         args = proc->args;
         fprintf(stderr, "pid: %d, priority: %d, exec_path: %s", proc->pid, proc->priority, proc->exec_path);
         while (args != NULL) {
-            printf(", arg: %s", args->element);
+            fprintf(stderr, ", arg: %s", args->element);
             args = args->next;
         }
         fprintf(stderr, "\n");
