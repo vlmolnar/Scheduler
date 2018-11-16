@@ -53,12 +53,14 @@ static Args_node* makeArgsNode(Args_node* previous, char* args_str) {
 /*
 * Allocates memory to a proc struct and fills it with relevant data
 */
-static Proc* makeProc(pid_t pid, unsigned int priority, char *exec_path, Args_node* args_head) {
+static Proc* makeProc(pid_t pid, unsigned int priority, char *exec_path, Args_node* args_head, unsigned int args_num) {
     Proc* new_p = malloc(sizeof(Proc));
     new_p->pid = pid;
     new_p->priority = priority;
     new_p->exec_path = exec_path;
     new_p->args = args_head;
+    new_p->args_num = args_num;
+    new_p->wait_time = 0;
 
     return new_p;
 }
@@ -138,7 +140,7 @@ void lineToProc(char* line, Pc_node** head_node) {
     Args_node* args_tail = NULL;
     unsigned int counter = 0;
     char* token = strtok(line, " \n");  //Tokenises string when reaching a space or newline character
-
+    unsigned int args_num = 0;
 
     while(token != NULL) {
         if (counter == 0) {
@@ -156,6 +158,8 @@ void lineToProc(char* line, Pc_node** head_node) {
             if (args_head == NULL) {
                 args_head = args_tail;
             }
+
+            args_num += 1;
         } else {
             fprintf(stderr, "Something went REALLY wrong with tokenising\n");
             break;
@@ -167,7 +171,7 @@ void lineToProc(char* line, Pc_node** head_node) {
     }
 
     if (priority <= 20 && exec_path != NULL) { //Quick validity check
-        proc = makeProc(0, priority, exec_path, args_head);  //Process id 0 by default, given correct value when process is created
+        proc = makeProc(0, priority, exec_path, args_head, args_num);  //Process id 0 by default, given correct value when process is created
         fprintf(stderr, "pid: %d, priority: %d, exec_path: %s\n", proc->pid, proc->priority, proc->exec_path);
         // if (*head_node == NULL) {
         //     head_node = addProcToFront(proc);

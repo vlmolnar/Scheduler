@@ -53,19 +53,20 @@ int main(int argc, char *argv[]) {
         if(pid1 < 0) {
             fprintf(stderr, "Something went wrong while creating process!\n");
         } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
+            kill(pid1,SIGSTOP);
             printf("Parent process.\n");
             prog_count+= 1;
-            kill(pid1,SIGSTOP);
             current_node->element->pid = pid1;  //Sets child's pid
         } else {  // We are a child process -- overwrite our process space with the new program
-            printf("Child process.\n");
+            // printf("Child process.\n");
             // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
+            char* ptArray[5];
             execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, NULL);  //TODO convert list into 2D array?
 
         }
 
         // kill(pid1, SIGCONT); //Lets process execute
-        // usleep(500000); //Takes in microseconds,1 ms is 100 us
+        // usleep(500000); //Takes in microseconds
 
 
         //FIFO
@@ -91,21 +92,22 @@ int main(int argc, char *argv[]) {
     while (prog_count > kill_count) {
           if (current_node == NULL) current_node = head_node; //Makes list loop
           pid1 = current_node->element->pid;
-          fprintf(stderr, "pid1: %d\n", pid1);
+          // fprintf(stderr, "pid1: %d\n", pid1);
 
           if (pid1 != -1) { //Skips terminated processes
 
           kill(pid1, SIGCONT); //Lets process execute
           usleep(QUANT_VAL); //Takes in microseconds
+
           id_t result = 0;
           int status = 0;
           result = waitpid( pid1, &status, WNOHANG );
           if (result == 0) {
-              fprintf(stderr, "Child lives on\n");
+              // fprintf(stderr, "Child lives on\n");
               kill(pid1,SIGSTOP); //Pauses process
           }
           if( result != 0) {  //Child process finished executing
-              fprintf(stderr, "Child is dead\n");
+              // fprintf(stderr, "Child is dead\n");
               kill(pid1, SIGTERM);  //Terminates process
               current_node->element->pid = -1; //Sets pid to indicate termination
               kill_count += 1;

@@ -3,7 +3,7 @@
 
 #include <signal.h>
 
-#define QUANT_VAL 2000  //Quantum value in microseconds, this is 2 milliseconds
+#define QUANT_VAL 100000  //Quantum value in microseconds, 200 milliseconds
 
 /*
 * A linked list to store the process variables as strings
@@ -21,7 +21,9 @@ typedef struct proc {
   // unsigned int pid;         //Process ID
   unsigned int priority;    //Process priority, where 0 is the highest and 20 the lowest
   char *exec_path;          //Path to executable, ex. ./starter.c (?)
-  Args_node* args;          //Arguments to executable
+  Args_node* args;          //Arguments to executable, stored as a pointer to a linked list
+  unsigned int args_num;         //Number of arguments
+  unsigned int wait_time;   //Waiting time of process
 } Proc;
 
 /*
