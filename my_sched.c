@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
         } else {  // We are a child process -- overwrite our process space with the new program
             printf("Child process.\n");
             // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
-/**/
+/*
             Args_node* args_head = current_node->element->args;
             if (args_head == NULL) {
               printf("No args\n");
@@ -90,17 +90,17 @@ int main(int argc, char *argv[]) {
                    args_counter += 1;
               }
 
-/**/
+*/
 
-              int i = 0;
-              while (*argsArray[i]) {
-                 fprintf(stderr,"array:  %s\n", argsArray[i]);
-                 i += 1;
-               } fprintf(stderr,"0: %s, 1: %s, 2: %s, 3: %s\n", argsArray[0], argsArray[1], argsArray[2], argsArray[3]);
+              // int i = 0;
+              // while (*argsArray[i]) {
+              //    fprintf(stderr,"array:  %s\n", argsArray[i]);
+              //    i += 1;
+              //  } fprintf(stderr,"0: %s, 1: %s, 2: %s, 3: %s\n", argsArray[0], argsArray[1], argsArray[2], argsArray[3]);
               // execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, current_node->element->args->next->element, current_node->element->args->next->next->element, '\0');  //TODO convert list into 2D array?
 /**/
-              execv(current_node->element->exec_path, argsArray);
-            }
+              execv(current_node->element->args_array[0], current_node->element->args_array);
+            // }
             /**/
         }
 

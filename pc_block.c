@@ -37,28 +37,29 @@ typedef struct pc_node {
 /*
 * Allocates memory to an args_node struct and fills it with the relevant data
 */
-static Args_node* makeArgsNode(Args_node* previous, char* args_str) {
-    Args_node* new_args = malloc(sizeof(Args_node));
-    new_args->element = args_str;
-    new_args->next = NULL;
-
-    if (previous != NULL) {
-        previous->next = new_args;
-    }
-
-    return new_args;
-}
+// static Args_node* makeArgsNode(Args_node* previous, char* args_str) {
+//     Args_node* new_args = malloc(sizeof(Args_node));
+//     new_args->element = args_str;
+//     new_args->next = NULL;
+//
+//     if (previous != NULL) {
+//         previous->next = new_args;
+//     }
+//
+//     return new_args;
+// }
 
 
 /*
 * Allocates memory to a proc struct and fills it with relevant data
 */
-static Proc* makeProc(pid_t pid, unsigned int priority, char *exec_path, Args_node* args_head, unsigned int args_num) {
+static Proc* makeProc(pid_t pid, unsigned int priority, char **args_array, unsigned int args_num) {
     Proc* new_p = malloc(sizeof(Proc));
     new_p->pid = pid;
     new_p->priority = priority;
-    new_p->exec_path = exec_path;
-    new_p->args = args_head;
+    // new_p->exec_path = exec_path;
+    // new_p->args = args_head;
+    new_p->args_array = args_array;
     new_p->args_num = args_num;
     new_p->wait_time = 0;
 
@@ -124,6 +125,7 @@ static void addProcToEnd(Proc* proc, Pc_node** head) {
 */
 void cleanList(Pc_node* node) {
   if (node) {
+    free(node->element->args_array);
     free(node->element);
     free(node);
     cleanList(node->next);
@@ -134,10 +136,11 @@ void cleanList(Pc_node* node) {
 * Processes line form input to a Proc struct
 */
 void lineToProc(char* line, Pc_node** head_node) {
-    unsigned int priority; char *exec_path;
+    unsigned int priority; //char *exec_path;
     Proc* proc = NULL;
-    Args_node* args_head = NULL;
-    Args_node* args_tail = NULL;
+    // Args_node* args_head = NULL;
+    // Args_node* args_tail = NULL;
+    char** args_array = malloc(sizeof(char*) * 2500);
     unsigned int counter = 0;
     char* token = strtok(line, " \n");  //Tokenises string when reaching a space or newline character
     unsigned int args_num = 0;
@@ -147,32 +150,34 @@ void lineToProc(char* line, Pc_node** head_node) {
             char* pri_str = strdup(token);
             priority = atoi(pri_str); //Converts string to int
             free(pri_str);
-        }
-      	else if (counter == 1) {
-            exec_path = strdup(token);
-        }
-      	else if (counter >= 2) {
-            char* p_args = strdup(token);
-            args_tail = makeArgsNode(args_tail, p_args);
+        } //Exec_path, remove this!
+      	// if (counter == 1) {
+        //     exec_path = strdup(token);
+        // }
+        //Exe_path and arguments
+      	else if (counter >= 1) {
 
-            if (args_head == NULL) {
-                args_head = args_tail;
-            }
-
+            args_array[counter - 1] = strdup(token);
             args_num += 1;
-        } else {
-            fprintf(stderr, "Something went REALLY wrong with tokenising\n");
-            break;
+            // char* p_args = strdup(token);
+            // args_tail = makeArgsNode(args_tail, p_args);
+            //
+            // if (args_head == NULL) {
+            //     args_head = args_tail;
+            // }
+            //
+            // args_num += 1;
         }
+        args_array[counter] = (char*) NULL;
 
 
         token = strtok(NULL, " \n");
         counter += 1;
     }
 
-    if (priority <= 20 && exec_path != NULL) { //Quick validity check
-        proc = makeProc(0, priority, exec_path, args_head, args_num);  //Process id 0 by default, given correct value when process is created
-        fprintf(stderr, "pid: %d, priority: %d, exec_path: %s\n", proc->pid, proc->priority, proc->exec_path);
+    if (priority <= 20 ) { //Quick validity check
+        proc = makeProc(0, priority, args_array, args_num);  //Process id 0 by default, given correct value when process is created
+        fprintf(stderr, "LineProc pid: %d, priority: %d\n", proc->pid, proc->priority);
         // if (*head_node == NULL) {
         //     head_node = addProcToFront(proc);
         // } else {
@@ -193,15 +198,26 @@ void printList(Pc_node* head_node) {
     fprintf(stderr, "Printing list...\n");
     Pc_node* node = head_node;
     Proc* proc;
-    Args_node* args;
+    // Args_node* args;
+    char** argsArray = node->element->args_array;
     while (node != NULL) {
         proc = node->element;
-        args = proc->args;
-        fprintf(stderr, "pid: %d, priority: %d, exec_path: %s", proc->pid, proc->priority, proc->exec_path);
-        while (args != NULL) {
-            fprintf(stderr, ", arg: %s", args->element);
-            args = args->next;
-        }
+
+
+        argsArray = proc->args_array;
+        fprintf(stderr, "Print pid: %d, priority: %d", proc->pid, proc->priority);
+        // while (args != NULL) {
+        //     fprintf(stderr, ", arg: %s", args->element);
+        //     args = args->next;
+        // }
+        unsigned int i = 0;
+        while (i < proc->args_num) {
+          fprintf(stderr, "---hello---\n");
+          if (argsArray[i] != (char*) NULL)
+            fprintf(stderr,", array:  %s", argsArray[i]);
+           i += 1;
+           fprintf(stderr, "---hi---\n");
+         }
         fprintf(stderr, "\n");
         node = node->next;
     }
