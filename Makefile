@@ -4,8 +4,8 @@ all:
 	gcc -o shed my_sched.c -Wall -Wextra
 
 sched:
-	gcc -o printchars printchars.c -Wall -Wextra
-	gcc -o sched my_sched.c pc_block.c sched.h -Wall -Wextra
+	gcc -g -o printchars printchars.c -Wall -Wextra
+	gcc -g -o sched my_sched.c pc_block.c sched.h -Wall -Wextra
 
 
 clean:

@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
     pid_t pid1;
     unsigned int prog_count = 0;
     unsigned int kill_count = 0;
+
     while (current_node) {
         pid1 = fork();  //New process
 
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
         } else {  // We are a child process -- overwrite our process space with the new program
             printf("Child process.\n");
             // execl("./printchars", "./printchars", "a", NULL);       // Print some "a"s
-/*
+/**/
             Args_node* args_head = current_node->element->args;
             if (args_head == NULL) {
               printf("No args\n");
@@ -68,33 +69,39 @@ int main(int argc, char *argv[]) {
             } else {
               printf("Some args, length:%d\n", current_node->element->args_num);
 
-              char argsArray[current_node->element->args_num + 1][500]; // Initialises char pointer array made up of args_num number of 500 char length strings
+              // Initialises char pointer array made up of args_num number of
+              // 500 char length strings. args_num + 2 because firt arg needs to
+              //be the path, while last arg needs to be NULL
+              char** argsArray = malloc(sizeof(char*) * 500);
+              // char argsArray[current_node->element->args_num + 2][500];
               Args_node* args_current = args_head;
               unsigned int args_counter = 1;
+
+              //Initialises first and last element of array
               strncpy(argsArray[0], current_node->element->exec_path, sizeof(current_node->element->exec_path) - 1);
+              argsArray[current_node->element->args_num + 1] = (char*)NULL;
 
               while (args_current) {
-                // strncpy corruption fix: https://eklitzke.org/beware-of-strncpy-and-strncat
+                  // strncpy corruption fix: https://eklitzke.org/beware-of-strncpy-and-strncat
+                   strncpy(argsArray[args_counter], args_current->element, sizeof(args_current->element) - 1);
 
-                 strncpy(argsArray[args_counter], args_current->element, sizeof(args_current->element) - 1);
-
-                 fprintf(stderr,"args_curent: %s, argsarray: %s\n",args_current->element, argsArray[args_counter]);
-                 args_current = args_current->next;
-                 args_counter += 1;
+                   fprintf(stderr,"args_current: %s, argsarray: %s\n",args_current->element, argsArray[args_counter]);
+                   args_current = args_current->next;
+                   args_counter += 1;
               }
-    */
-              // int i = 0;
-              // while (*argsArray[i]) {
-              //    fprintf(stderr,"array:  %s\n", argsArray[i]);
-              //    i += 1;
-              //  }
-               // fprintf(stderr,"0: %s, 1: %s, 2: %s\n", argsArray[0], argsArray[1], argsArray[2]);
-              execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, NULL);  //TODO convert list into 2D array?
 
+/**/
 
-              // execvp(current_node->element->exec_path, argsArray);
-
-            /*}*/
+              int i = 0;
+              while (*argsArray[i]) {
+                 fprintf(stderr,"array:  %s\n", argsArray[i]);
+                 i += 1;
+               } fprintf(stderr,"0: %s, 1: %s, 2: %s, 3: %s\n", argsArray[0], argsArray[1], argsArray[2], argsArray[3]);
+              // execl(current_node->element->exec_path, current_node->element->exec_path, current_node->element->args->element, current_node->element->args->next->element, current_node->element->args->next->next->element, '\0');  //TODO convert list into 2D array?
+/**/
+              execv(current_node->element->exec_path, argsArray);
+            }
+            /**/
         }
 
         // kill(pid1, SIGCONT); //Lets process execute
