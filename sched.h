@@ -6,24 +6,13 @@
 #define QUANT_VAL 200000  //Quantum value in microseconds, 200 milliseconds
 
 /*
-* A linked list to store the process variables as strings
-*/
-// typedef struct args_node {
-//     char* element;
-//     struct args_node* next;
-// } Args_node;
-
-/*
 * A basic Process Control Block struct to contain relevant details of all processes
 */
 typedef struct proc {
   pid_t pid;                //Process ID
-  // unsigned int pid;         //Process ID
   unsigned int priority;    //Process priority, where 0 is the highest and 20 the lowest
-  // char *exec_path;          //Path to executable, ex. ./starter.c (?)
-  // Args_node* args;          //Arguments to executable, stored as a pointer to a linked list
-  char** args_array;
-  unsigned int args_num;         //Number of arguments
+  char** args_array;        // An array of char pointers to contain all process arguments
+  unsigned int args_num;    //Number of arguments
   unsigned int wait_time;   //Waiting time of process
 } Proc;
 
