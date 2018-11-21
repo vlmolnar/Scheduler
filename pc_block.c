@@ -50,7 +50,7 @@ static void addProcToEnd(Proc* proc, Pc_node** head) {
     }
     if (*head == NULL) {
         *head = makeProcNode(proc, NULL); //Adds node to head of list
-        fprintf(stderr, "2 Head: %d\n", *head == NULL);
+        // fprintf(stderr, "2 Head: %d\n", *head == NULL);
         return;
     }
 
@@ -113,7 +113,7 @@ void lineToProc(char* line, Pc_node** head_node) {
 
     if (priority <= 20 && args_array[0]) { //Quick validity check
         proc = makeProc(0, priority, args_array, args_num);  //Process id 0 by default, given correct value when process is created
-        fprintf(stderr, "LineProc pid: %d, priority: %d\n", proc->pid, proc->priority);
+        // fprintf(stderr, "LineProc pid: %d, priority: %d\n", proc->pid, proc->priority);
         addProcToEnd(proc, head_node);
     } else { //Invalid input
       fprintf(stderr, "Tokenising error\n");
@@ -134,7 +134,7 @@ void printList(Pc_node* head_node) {
 
 
         argsArray = proc->args_array;
-        fprintf(stderr, "Print pid: %d, priority: %d", proc->pid, proc->priority);
+        fprintf(stderr, "Print pid: %d, priority: %d, wait_time: %d", proc->pid, proc->priority, proc->wait_time);
         unsigned int i = 0;
         while (i < proc->args_num) {
           if (argsArray[i] != (char*) NULL)
@@ -144,4 +144,42 @@ void printList(Pc_node* head_node) {
         fprintf(stderr, "\n");
         node = node->next;
     }
+}
+
+/*
+* Increments the wait_time of each process that isn't being executed (pid_ex)
+* and hasn't been terminated (pid = -1)
+*/
+void incrementAllWait(Pc_node* head_node, pid_t pid_ex) {
+    Pc_node* current_node = head_node;
+
+    while (current_node) {
+
+        if (current_node->element->pid != pid_ex && current_node->element->pid != -1)
+            current_node->element->wait_time += 1;
+
+
+        current_node = current_node->next;
+    }
+
+}
+
+/*
+* Calculates the average wait time of all processes stored within the list
+*/
+void averageWaitTime(Pc_node* head_node) {
+  double average;
+  unsigned int total_wait = 0;
+  unsigned int node_counter = 0;
+  Pc_node* current_node = head_node;
+
+  while(current_node) {
+      total_wait += current_node->element->wait_time;
+      node_counter += 1;
+      current_node = current_node->next;
+  }
+
+  //Average in milliseconds, quantum is in microseconds hence the conversion
+  average = (total_wait/node_counter)*(QUANT_VAL/1000);
+  fprintf(stderr, "\nAverage wait time: %.2f ms\n", average);
 }

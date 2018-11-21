@@ -33,4 +33,8 @@ void cleanList(Pc_node* node);
 
 void printList(Pc_node* head_node);
 
+void incrementAllWait(Pc_node* head_node, pid_t pid_ex);
+
+void averageWaitTime(Pc_node* head_node);
+
 #endif

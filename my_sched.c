@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     fp = fopen(argv[1], "r");  //Opens file for reading
 
     if (fp == NULL) {
-      fprintf(stderr, "Error: Invalid file path %s\n", argv[1]);
+      fprintf(stderr, "Error: Invalid FILE path \"%s\"\n", argv[1]);
       exit(0);
     }
 
@@ -35,12 +35,12 @@ int main(int argc, char *argv[]) {
 
     //While there is a new line
     while ((fgets(line, sizeof(line), fp))) { //Ref: https://stackoverflow.com/questions/9206091/going-through-a-text-file-line-by-line-in-c
-      fprintf(stderr, "In while, line is: %s\n", line);
+      // fprintf(stderr, "In while, line is: %s\n", line);
         lineToProc(line, &head_node);
     }
     fclose(fp); //Closes file
 
-    printList(head_node);
+    // printList(head_node);
 
 
     /***************************
@@ -58,14 +58,16 @@ int main(int argc, char *argv[]) {
 
         if(pid1 < 0) {
             fprintf(stderr, "Something went wrong while creating process!\n");
-        } else if(pid1 > 0) {    // We are parent. Immediately stop the new process
+        } else if(pid1 > 0) {    //Parent process
             kill(pid1,SIGSTOP);
-            printf("Parent process.\n");
+            // printf("Parent process.\n");
             prog_count+= 1;
             current_node->element->pid = pid1;  //Sets child's pid
-        } else {  // We are a child process -- overwrite our process space with the new program
-            printf("Child process.\n");
+        } else {  //Child process
+            // printf("Child process.\n");
               execv(current_node->element->args_array[0], current_node->element->args_array);
+              fprintf(stderr, "Error: Invalid process path \"%s\"\n", current_node->element->args_array[0]);
+              exit(0);
         }
 
         //FIFO
@@ -106,19 +108,25 @@ int main(int argc, char *argv[]) {
           id_t result = 0;
           int status = 0;
           result = waitpid( pid1, &status, WNOHANG );
+
           if (result == 0) {
+            // fprintf(stderr, "Child %d still going stong\n", pid1);
               kill(pid1,SIGSTOP); //Pauses process
           }
-          if( result != 0) {  //Child process finished executing
+          else {  //Child process finished executing
+            // fprintf(stderr, "Child %d terminated\n", pid1);
               kill(pid1, SIGTERM);  //Terminates process
               current_node->element->pid = -1; //Sets pid to indicate termination
               kill_count += 1;
           }
+          incrementAllWait(head_node, pid1);
       }
       current_node = current_node->next;
     }
 
+    // printList(head_node);
+    averageWaitTime(head_node);
     cleanList(head_node);
-    fprintf(stderr, "Program finished executing!\n");
+    fprintf(stderr, "\n--Program finished executing!--\n");
 
 }
