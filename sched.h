@@ -37,4 +37,6 @@ void incrementAllWait(Pc_node* head_node, pid_t pid_ex);
 
 void averageWaitTime(Pc_node* head_node);
 
+void replicateList(Pc_node* old_head, Pc_node** new_head);
+
 #endif

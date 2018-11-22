@@ -95,9 +95,21 @@ int main(int argc, char *argv[]) {
     * SCHEDULING *
     *************/
 
+    Pc_node* queue1_head = NULL;  //Priority 0-6
+    // Pc_node* queue2_head = NULL; //Priority 7-13
+    // Pc_node* queue3_head = NULL; //Priority 14-20
+    replicateList(head_node, &queue1_head);
+    fprintf(stderr, "Printing original\n");
+    printList(head_node);
+    fprintf(stderr, "Printing copy\n");
+    printList(queue1_head);
+
+    Pc_node* sched_node = queue1_head;
+
     while (prog_count > kill_count) {
-          if (current_node == NULL) current_node = head_node; //Makes list loop
-          pid1 = current_node->element->pid;
+          // if (current_node == NULL) current_node = head_node; //Makes list loop
+          if (sched_node == NULL) sched_node = queue1_head; //Makes list loop
+          pid1 = sched_node->element->pid;
           // fprintf(stderr, "pid1: %d\n", pid1);
 
           if (pid1 != -1) { //Skips terminated processes
@@ -116,16 +128,18 @@ int main(int argc, char *argv[]) {
           else {  //Child process finished executing
             // fprintf(stderr, "Child %d terminated\n", pid1);
               kill(pid1, SIGTERM);  //Terminates process
-              current_node->element->pid = -1; //Sets pid to indicate termination
+              sched_node->element->pid = -1; //Sets pid to indicate termination
               kill_count += 1;
           }
           incrementAllWait(head_node, pid1);
       }
-      current_node = current_node->next;
+      sched_node = sched_node->next;
     }
-
+    fprintf(stderr, "Out of loops\n");
     // printList(head_node);
-    averageWaitTime(head_node);
+    // averageWaitTime(head_node);
+    averageWaitTime(queue1_head);
+    // cleanList(queue1_head);
     cleanList(head_node);
     fprintf(stderr, "\n--Program finished executing!--\n");
 

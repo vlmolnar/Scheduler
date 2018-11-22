@@ -66,15 +66,54 @@ static void addProcToEnd(Proc* proc, Pc_node** head) {
 }
 
 /*
+* Creates a copy of the linked list
+*/
+void replicateList(Pc_node* old_head, Pc_node** new_head) {
+    // Pc_node* new_head =  malloc(sizeof(Pc_node));
+    // (*new_head)->element = old_head->element;
+    // (*new_head)->next = NULL;
+    Pc_node* old_current = old_head;
+
+    while (old_current) {
+      fprintf(stderr, "Hi\n");
+        addProcToEnd(old_current->element, new_head);
+        old_current = old_current->next;
+    }
+}
+
+/*
+* Removes a given process from a linked list if it is contained
+*/
+void removeProc(Pc_node* head_node, pid_t pid) {
+    if (! head_node) {
+        fprintf(stderr, "Error: invalid process node provided to delete\n");
+        return;
+    }
+
+    Pc_node* previous_node = NULL;
+    Pc_node* current_node = head_node;
+    while( current_node) {
+        if (current_node->element->pid == pid) {
+            previous_node->next = current_node->next;
+            free(current_node);
+            break;
+        }
+
+        previous_node = current_node;
+        current_node = current_node->next;
+    }
+}
+
+/*
 * Recursively frees up all memory allocated to list
 */
 void cleanList(Pc_node* node) {
-  if (node) {
-    free(node->element->args_array);
-    free(node->element);
-    free(node);
-    cleanList(node->next);
-  }
+    if (node) {
+        free(node->element->args_array);
+        free(node->element);
+        free(node);
+        cleanList(node->next);
+    }
 }
 
 /*
